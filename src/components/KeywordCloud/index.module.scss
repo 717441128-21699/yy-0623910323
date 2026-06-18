@@ -1,0 +1,43 @@
+@use '@/styles/variables.scss' as *;
+
+.cloudContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  padding: $spacing-md 0;
+}
+
+.keywordTag {
+  padding: 12rpx 24rpx;
+  border-radius: $radius-button;
+  background: $color-bg-tag;
+  cursor: pointer;
+  transition: all $transition-base;
+  display: inline-flex;
+  align-items: center;
+  animation: fadeInUp 0.4s ease both;
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.active {
+    box-shadow: 0 4rpx 12rpx rgba(79, 110, 247, 0.25);
+  }
+}
+
+.keywordText {
+  font-weight: $font-weight-medium;
+  line-height: 1.4;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,13 @@
+@use '@/styles/variables.scss' as *;
+
+.radarContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: $spacing-md 0;
+}
+
+.canvas {
+  display: block;
+}

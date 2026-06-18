@@ -1,0 +1,167 @@
+@use '@/styles/variables.scss' as *;
+
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.25s ease;
+}
+
+.drawer {
+  width: 100%;
+  max-height: 75vh;
+  background: $color-bg-card;
+  border-radius: 32rpx 32rpx 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.keyword {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.count {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.closeBtn {
+  padding: 8rpx 20rpx;
+  background: $color-bg-tag;
+  border-radius: $radius-button;
+}
+
+.closeText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.typeTabs {
+  padding: $spacing-md $spacing-lg;
+  white-space: nowrap;
+  border-bottom: 1rpx solid $color-divider;
+  @include scroll-x-container;
+}
+
+.typeTab {
+  @include scroll-x-item(auto);
+  padding: 12rpx 28rpx;
+  border-radius: $radius-button;
+  margin-right: $spacing-sm;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-fast;
+}
+
+.typeTabText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.commentList {
+  flex: 1;
+  padding: $spacing-md $spacing-lg;
+  padding-bottom: 60rpx;
+}
+
+.commentItem {
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.typeBadge {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.typeBadgeText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.source {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.commentContent {
+  display: block;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: 1.6;
+  margin-bottom: $spacing-sm;
+}
+
+.commentFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.likes {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 0;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

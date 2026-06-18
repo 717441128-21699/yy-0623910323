@@ -1,0 +1,98 @@
+@use '@/styles/variables.scss' as *;
+
+.item {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-sm;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+
+  &.done {
+    opacity: 0.6;
+
+    .title,
+    .description {
+      text-decoration: line-through;
+      color: $color-text-tertiary;
+    }
+  }
+}
+
+.checkbox {
+  flex-shrink: 0;
+  padding-top: 4rpx;
+}
+
+.checkboxInner {
+  width: 40rpx;
+  height: 40rpx;
+  border: 2rpx solid $color-border;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all $transition-base;
+
+  &.checked {
+    background: $color-success;
+    border-color: $color-success;
+  }
+}
+
+.checkmark {
+  color: $color-text-white;
+  font-size: 24rpx;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.categoryTag {
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.categoryText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.priorityTag {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.title {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 8rpx;
+  @include text-ellipsis;
+}
+
+.description {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.6;
+  @include text-ellipsis-multi(2);
+}
