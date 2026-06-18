@@ -28,6 +28,7 @@ const CloudmapPage: React.FC = () => {
   const [currentKeyword, setCurrentKeyword] = useState('')
   const [comments, setComments] = useState<CommentSample[]>([])
   const [expandedDimensions, setExpandedDimensions] = useState<Set<string>>(new Set())
+  const [scrollTargetId, setScrollTargetId] = useState<string>('')
 
   const filteredActivities = useMemo(() => getFilteredActivities(), [getFilteredActivities])
 
@@ -98,6 +99,54 @@ const CloudmapPage: React.FC = () => {
     return result
   }, [selectedActivity, previousSameTypeActivity, comparisonData])
 
+  const reportCardData = useMemo(() => {
+    if (!selectedActivity || !previousSameTypeActivity || !comparisonData) return null
+    const overallDiff = selectedActivity.overallScore - previousSameTypeActivity.overallScore
+
+    const topUp = comparisonData.filter(d => d.change > 0).sort((a, b) => b.change - a.change)[0]
+    const topDown = comparisonData.filter(d => d.change < 0).sort((a, b) => a.change - b.change)[0]
+
+    const upKeywords = topUp
+      ? getKeywordsByDimension(selectedActivity, topUp.name).slice(0, 3)
+      : []
+    const downKeywords = topDown
+      ? getKeywordsByDimension(selectedActivity, topDown.name).slice(0, 3)
+      : []
+
+    const highPriorityPending = relatedReviews
+      .filter(r => r.status === 'pending' && r.priority === 'high')
+      .slice(0, 2)
+
+    const nextSteps: string[] = []
+    if (topDown) {
+      nextSteps.push(`重点提升「${topDown.name}」维度，关注相关讨论方向`)
+    }
+    if (highPriorityPending.length > 0) {
+      nextSteps.push(`优先处理 ${highPriorityPending.length} 项高优复盘建议`)
+    }
+    if (topUp) {
+      nextSteps.push(`延续「${topUp.name}」的成功经验`)
+    }
+    if (nextSteps.length === 0) {
+      nextSteps.push('保持当前节奏，各维度整体稳定')
+    }
+
+    return {
+      activityTitle: selectedActivity.title,
+      compareTitle: previousSameTypeActivity.title,
+      overallScore: selectedActivity.overallScore,
+      previousScore: previousSameTypeActivity.overallScore,
+      overallDiff,
+      topUp,
+      topDown,
+      upKeywords,
+      downKeywords,
+      highPriorityPending,
+      nextSteps,
+      date: new Date('2024-06-19').toLocaleDateString('zh-CN')
+    }
+  }, [selectedActivity, previousSameTypeActivity, comparisonData, relatedReviews])
+
   const handleCopySummary = () => {
     if (!comparisonSummary) return
     Taro.setClipboardData({
@@ -122,6 +171,16 @@ const CloudmapPage: React.FC = () => {
     const progress = total > 0 ? Math.round((done / total) * 100) : 0
     return { total, done, pending, pendingHigh, progress }
   }, [relatedReviews])
+
+  const highPriorityPendingReviews = useMemo(() => {
+    return relatedReviews.filter(r => r.status === 'pending' && r.priority === 'high')
+  }, [relatedReviews])
+
+  const handleHighPriorityClick = (reviewId: string) => {
+    setScrollTargetId(`review-${reviewId}`)
+    setTimeout(() => setScrollTargetId(''), 500)
+    console.log('[CloudmapPage] scroll to review:', reviewId)
+  }
 
   const handleActivityChange = (id: string) => {
     setSelectedActivity(id)
@@ -246,6 +305,8 @@ const CloudmapPage: React.FC = () => {
         scrollY
         className={styles.content}
         showScrollbar={false}
+        scrollIntoView={scrollTargetId}
+        scrollWithAnimation
       >
         <View className={styles.overallCard}>
           <View
@@ -301,15 +362,113 @@ const CloudmapPage: React.FC = () => {
                 </View>
               ))}
             </View>
-            {comparisonSummary && (
-              <View className={styles.summaryBlock}>
-                <View className={styles.summaryHeader}>
-                  <Text className={styles.summaryTitle}>📝 复盘摘要</Text>
-                  <View className={styles.copyBtn} onClick={handleCopySummary}>
-                    <Text className={styles.copyBtnText}>复制</Text>
+            {reportCardData && (
+              <View className={styles.reportCard}>
+                <View className={styles.reportCardHeader}>
+                  <View>
+                    <Text className={styles.reportCardTitle}>口碑对比报告</Text>
+                    <Text className={styles.reportCardSubtitle}>
+                      {reportCardData.activityTitle}
+                    </Text>
+                  </View>
+                  <View className={styles.reportCardCopy} onClick={handleCopySummary}>
+                    <Text className={styles.reportCardCopyText}>复制</Text>
                   </View>
                 </View>
-                <Text className={styles.summaryText} selectable>{comparisonSummary}</Text>
+
+                <View className={styles.reportCardScore}>
+                  <View className={styles.reportCardScoreMain}>
+                    <Text className={styles.reportCardScoreNum}>{reportCardData.overallScore}</Text>
+                    <Text className={styles.reportCardScoreLabel}>本次综合分</Text>
+                  </View>
+                  <View className={styles.reportCardVs}>
+                    <Text className={styles.reportCardVsText}>VS</Text>
+                  </View>
+                  <View className={styles.reportCardScoreMain}>
+                    <Text className={styles.reportCardScoreNum} style={{ color: '#86909c' }}>{reportCardData.previousScore}</Text>
+                    <Text className={styles.reportCardScoreLabel}>上次综合分</Text>
+                  </View>
+                  <View className={classnames(styles.reportCardDiff, getChangeClass(reportCardData.overallDiff))}>
+                    <Text className={styles.reportCardDiffText}>
+                      {getChangeText(reportCardData.overallDiff)}
+                    </Text>
+                  </View>
+                </View>
+
+                <View className={styles.reportCardChanges}>
+                  {reportCardData.topUp && (
+                    <View className={styles.reportCardChangeItem}>
+                      <View className={styles.reportCardChangeHeader}>
+                        <Text className={styles.reportCardChangeIcon}>�</Text>
+                        <Text className={styles.reportCardChangeTitle}>最大提升</Text>
+                      </View>
+                      <Text className={styles.reportCardChangeDim}>{reportCardData.topUp.name}</Text>
+                      <Text className={classnames(styles.reportCardChangeVal, 'up')}>
+                        +{reportCardData.topUp.change} 分
+                      </Text>
+                      <Text className={styles.reportCardChangeReason}>{reportCardData.topUp.reason}</Text>
+                      {reportCardData.upKeywords.length > 0 && (
+                        <View className={styles.reportCardKeywords}>
+                          {reportCardData.upKeywords.map(kw => (
+                            <Text key={kw.word} className={styles.reportCardKeyword} style={{ color: '#00b42a', backgroundColor: 'rgba(0,180,42,0.1)' }}>
+                              {kw.word}
+                            </Text>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                  )}
+
+                  {reportCardData.topDown && (
+                    <View className={styles.reportCardChangeItem}>
+                      <View className={styles.reportCardChangeHeader}>
+                        <Text className={styles.reportCardChangeIcon}>📉</Text>
+                        <Text className={styles.reportCardChangeTitle}>最大下滑</Text>
+                      </View>
+                      <Text className={styles.reportCardChangeDim}>{reportCardData.topDown.name}</Text>
+                      <Text className={classnames(styles.reportCardChangeVal, 'down')}>
+                        {reportCardData.topDown.change} 分
+                      </Text>
+                      <Text className={styles.reportCardChangeReason}>{reportCardData.topDown.reason}</Text>
+                      {reportCardData.downKeywords.length > 0 && (
+                        <View className={styles.reportCardKeywords}>
+                          {reportCardData.downKeywords.map(kw => (
+                            <Text key={kw.word} className={styles.reportCardKeyword} style={{ color: '#f53f3f', backgroundColor: 'rgba(245,63,63,0.1)' }}>
+                              {kw.word}
+                            </Text>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                  )}
+                </View>
+
+                {reportCardData.highPriorityPending.length > 0 && (
+                  <View className={styles.reportCardSection}>
+                    <Text className={styles.reportCardSectionTitle}>⚡ 高优待办</Text>
+                    {reportCardData.highPriorityPending.map(item => (
+                      <View key={item.id} className={styles.reportCardTodo}>
+                        <View className={styles.reportCardTodoDot}></View>
+                        <Text className={styles.reportCardTodoText}>{item.title}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                <View className={styles.reportCardSection}>
+                  <Text className={styles.reportCardSectionTitle}>💡 下一步建议</Text>
+                  {reportCardData.nextSteps.map((step, i) => (
+                    <View key={i} className={styles.reportCardNext}>
+                      <Text className={styles.reportCardNextNum}>{i + 1}</Text>
+                      <Text className={styles.reportCardNextText}>{step}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                <View className={styles.reportCardFooter}>
+                  <Text className={styles.reportCardDate}>生成于 {reportCardData.date}</Text>
+                  <Text className={styles.reportCardBrand}>口碑云图</Text>
+                </View>
               </View>
             )}
           </View>
@@ -584,6 +743,33 @@ const CloudmapPage: React.FC = () => {
                   </View>
                 )}
               </View>
+
+              {highPriorityPendingReviews.length > 0 && (
+                <View className={styles.highPriorityList}>
+                  <Text className={styles.highPriorityLabel}>
+                    ⚡ 高优先收事项
+                  </Text>
+                  {highPriorityPendingReviews.map(review => {
+                    const catMeta = getCategoryMeta(review.category)
+                    return (
+                      <View
+                        key={review.id}
+                        className={styles.highPriorityItem}
+                        onClick={() => handleHighPriorityClick(review.id)}
+                      >
+                        <View
+                          className={styles.highPriorityCat}
+                          style={{ backgroundColor: catMeta?.color + '20', color: catMeta?.color }}
+                        >
+                          <Text>{catMeta?.label}</Text>
+                        </View>
+                        <Text className={styles.highPriorityTitle}>{review.title}</Text>
+                        <Text className={styles.highPriorityArrow}>↓</Text>
+                      </View>
+                    )
+                  })}
+                </View>
+              )}
             </View>
 
             <View className={styles.inlineReviewList}>
@@ -592,6 +778,7 @@ const CloudmapPage: React.FC = () => {
                 return (
                   <View
                     key={review.id}
+                    id={`review-${review.id}`}
                     className={classnames(styles.inlineReviewItem, review.status === 'done' && styles.done)}
                   >
                     <View

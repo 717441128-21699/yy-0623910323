@@ -2,7 +2,8 @@ export default defineAppConfig({
   pages: [
     'pages/activity/index',
     'pages/cloudmap/index',
-    'pages/review/index'
+    'pages/review/index',
+    'pages/type-trend/index'
   ],
   window: {
     backgroundTextStyle: 'light',

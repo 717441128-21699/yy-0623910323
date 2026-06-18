@@ -102,13 +102,11 @@ const ActivityPage: React.FC = () => {
     console.log('[ActivityPage] filter changed:', type)
   }
 
-  const handleTypeCardClick = (type: ActivityType, latestId: string) => {
-    setActiveFilter(type)
-    if (latestId) {
-      setSelectedActivity(latestId)
-      Taro.switchTab({ url: '/pages/cloudmap/index' })
-    }
-    console.log('[ActivityPage] type card clicked:', type, latestId)
+  const handleTypeCardClick = (type: ActivityType) => {
+    Taro.navigateTo({
+      url: `/pages/type-trend/index?type=${type}`
+    })
+    console.log('[ActivityPage] type trend card clicked:', type)
   }
 
   const handleRefresh = () => {
@@ -253,7 +251,7 @@ const ActivityPage: React.FC = () => {
                 styles.trendCard,
                 item.count === 0 && styles.emptyCard
               )}
-              onClick={() => item.latestId && handleTypeCardClick(item.type, item.latestId)}
+              onClick={() => item.count > 0 && handleTypeCardClick(item.type)}
             >
               <View className={styles.trendCardHeader}>
                 <Text className={styles.trendCardLabel}>{item.label}</Text>

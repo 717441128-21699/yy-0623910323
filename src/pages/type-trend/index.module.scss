@@ -1,0 +1,327 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+  background: linear-gradient(180deg, #f5f7ff 0%, #f7f8fa 30%);
+}
+
+.header {
+  padding: $spacing-lg $page-padding;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  margin-bottom: $spacing-md;
+}
+
+.headerLabel {
+  display: block;
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 4rpx;
+}
+
+.headerDesc {
+  display: block;
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  margin-bottom: $spacing-lg;
+  line-height: 1.2;
+}
+
+.statsRow {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.statCard {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10rpx);
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-xs;
+  text-align: center;
+
+  .up {
+    color: #b7ffc7;
+  }
+
+  .down {
+    color: #ffd1d1;
+  }
+
+  .flat {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.statNum {
+  display: block;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+  line-height: 1.2;
+  margin-bottom: 4rpx;
+}
+
+.statLabel {
+  display: block;
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-sm;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionTip {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.timeline {
+  padding: 0 $page-padding;
+  padding-left: calc(#{$page-padding} + 16rpx);
+  position: relative;
+}
+
+.timelineItem {
+  position: relative;
+  padding-left: $spacing-lg;
+  padding-bottom: $spacing-md;
+
+  &:last-child {
+    .timelineLine {
+      display: none;
+    }
+  }
+}
+
+.timelineDot {
+  position: absolute;
+  left: -8rpx;
+  top: 28rpx;
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: $color-bg-card;
+  border: 4rpx solid $color-primary;
+  z-index: 2;
+}
+
+.timelineDotInner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: $color-primary;
+}
+
+.timelineLine {
+  position: absolute;
+  left: 0;
+  top: 56rpx;
+  bottom: -$spacing-md;
+  width: 2rpx;
+  background: $color-divider;
+}
+
+.timelineCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+
+  &.belowAvg {
+    border: 1rpx solid rgba(245, 63, 63, 0.2);
+    background: linear-gradient(135deg, #fff5f5 0%, $color-bg-card 50%);
+  }
+
+  &.latest {
+    border: 1rpx solid rgba(79, 110, 247, 0.3);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: 8rpx;
+}
+
+.cardDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-medium;
+}
+
+.cardTag {
+  padding: 4rpx 12rpx;
+  background: $color-primary-bg;
+  border-radius: $radius-xs;
+
+  &.warningTag {
+    background: $color-error-light;
+  }
+}
+
+.cardTagText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+
+  .warningTag & {
+    color: $color-error;
+  }
+}
+
+.cardTitle {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis;
+}
+
+.cardScoreRow {
+  display: flex;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-sm;
+}
+
+.cardScoreWrap,
+.cardChangeWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.cardScore {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.1;
+}
+
+.cardScoreLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.cardChange {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+
+  &.up {
+    color: $color-success;
+  }
+
+  &.down {
+    color: $color-error;
+  }
+
+  &.flat {
+    color: $color-text-tertiary;
+  }
+}
+
+.cardChangeLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.cardReview {
+  padding-top: $spacing-sm;
+  border-top: 1rpx dashed $color-divider;
+}
+
+.cardReviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8rpx;
+}
+
+.cardReviewLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.cardReviewRate {
+  font-size: $font-size-xs;
+  color: $color-success;
+  font-weight: $font-weight-semibold;
+}
+
+.cardReviewBar {
+  width: 100%;
+  height: 10rpx;
+  background: $color-bg-tag;
+  border-radius: 5rpx;
+  overflow: hidden;
+  margin-bottom: 8rpx;
+}
+
+.cardReviewFill {
+  height: 100%;
+  border-radius: 5rpx;
+  background: linear-gradient(90deg, $color-success 0%, #22c55e 100%);
+  transition: width 0.5s ease;
+}
+
+.cardReviewFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardReviewCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.cardReviewHigh {
+  font-size: $font-size-xs;
+  color: $color-error;
+  font-weight: $font-weight-medium;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.emptyEmoji {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.emptyDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

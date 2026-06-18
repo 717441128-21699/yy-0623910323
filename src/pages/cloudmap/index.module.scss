@@ -299,6 +299,301 @@
   word-break: break-all;
 }
 
+.reportCard {
+  margin-top: $spacing-md;
+  background: #fff;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  border: 1rpx solid rgba(255, 125, 0, 0.15);
+  box-shadow: 0 4rpx 20rpx rgba(255, 125, 0, 0.08);
+}
+
+.reportCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1rpx dashed $color-divider;
+}
+
+.reportCardTitle {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.2;
+  margin-bottom: 4rpx;
+}
+
+.reportCardSubtitle {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  @include text-ellipsis;
+  max-width: 380rpx;
+}
+
+.reportCardCopy {
+  padding: 6rpx 20rpx;
+  background: linear-gradient(135deg, #ff7d00 0%, #ff9b33 100%);
+  border-radius: $radius-button;
+  flex-shrink: 0;
+  transition: all $transition-fast;
+
+  &:active {
+    opacity: 0.85;
+    transform: scale(0.97);
+  }
+}
+
+.reportCardCopyText {
+  font-size: $font-size-xs;
+  color: #fff;
+  font-weight: $font-weight-medium;
+}
+
+.reportCardScore {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, #fff7f0 0%, #fffdfb 100%);
+  border-radius: $radius-md;
+  position: relative;
+  overflow: visible;
+}
+
+.reportCardScoreMain {
+  text-align: center;
+  flex: 1;
+}
+
+.reportCardScoreNum {
+  display: block;
+  font-size: 56rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.1;
+  margin-bottom: 4rpx;
+}
+
+.reportCardScoreLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.reportCardVs {
+  padding: 0 $spacing-sm;
+}
+
+.reportCardVsText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-text-tertiary;
+}
+
+.reportCardDiff {
+  position: absolute;
+  top: -10rpx;
+  right: $spacing-md;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-button;
+
+  &.up {
+    background: rgba(0, 180, 42, 0.1);
+    .reportCardDiffText {
+      color: $color-success;
+    }
+  }
+
+  &.down {
+    background: rgba(245, 63, 63, 0.1);
+    .reportCardDiffText {
+      color: $color-error;
+    }
+  }
+
+  &.flat {
+    background: rgba(134, 144, 156, 0.1);
+    .reportCardDiffText {
+      color: $color-text-tertiary;
+    }
+  }
+}
+
+.reportCardDiffText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+}
+
+.reportCardChanges {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.reportCardChangeItem {
+  flex: 1;
+  min-width: 0;
+  padding: $spacing-sm;
+  background: $color-bg-tag;
+  border-radius: $radius-md;
+}
+
+.reportCardChangeHeader {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  margin-bottom: 6rpx;
+}
+
+.reportCardChangeIcon {
+  font-size: $font-size-sm;
+}
+
+.reportCardChangeTitle {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+}
+
+.reportCardChangeDim {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.reportCardChangeVal {
+  display: block;
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  line-height: 1.2;
+  margin-bottom: 6rpx;
+
+  &.up {
+    color: $color-success;
+  }
+
+  &.down {
+    color: $color-error;
+  }
+}
+
+.reportCardChangeReason {
+  display: block;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  line-height: 1.4;
+  margin-bottom: 8rpx;
+  @include text-ellipsis-multi(2);
+}
+
+.reportCardKeywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6rpx;
+}
+
+.reportCardKeyword {
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+  font-size: 20rpx;
+  font-weight: $font-weight-medium;
+  line-height: 1.5;
+}
+
+.reportCardSection {
+  margin-bottom: $spacing-sm;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.reportCardSectionTitle {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.reportCardTodo {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 0;
+}
+
+.reportCardTodoDot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: $color-warning;
+  flex-shrink: 0;
+}
+
+.reportCardTodoText {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  flex: 1;
+  @include text-ellipsis;
+}
+
+.reportCardNext {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-xs;
+  padding: 8rpx 0;
+}
+
+.reportCardNextNum {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: $color-primary-bg;
+  color: $color-primary;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.reportCardNextText {
+  flex: 1;
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  line-height: 1.6;
+  padding-top: 4rpx;
+}
+
+.reportCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1rpx dashed $color-divider;
+}
+
+.reportCardDate {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+}
+
+.reportCardBrand {
+  font-size: 20rpx;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
 .compareBarRow {
   display: flex;
   align-items: center;
@@ -914,4 +1209,65 @@
 .progressStatLabel {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
+}
+
+.highPriorityList {
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1rpx dashed rgba(79, 110, 247, 0.15);
+}
+
+.highPriorityLabel {
+  display: block;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-error;
+  margin-bottom: 8rpx;
+}
+
+.highPriorityItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: 10rpx 12rpx;
+  background: #fff;
+  border-radius: $radius-sm;
+  margin-bottom: 8rpx;
+  border: 1rpx solid rgba(245, 63, 63, 0.15);
+  transition: all $transition-fast;
+
+  &:active {
+    background: #fff5f5;
+    transform: scale(0.98);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.highPriorityCat {
+  flex-shrink: 0;
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+  font-size: 20rpx;
+  font-weight: $font-weight-medium;
+  display: inline-flex;
+  align-items: center;
+}
+
+.highPriorityTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: $font-size-xs;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  @include text-ellipsis;
+}
+
+.highPriorityArrow {
+  flex-shrink: 0;
+  font-size: $font-size-xs;
+  color: $color-error;
+  font-weight: bold;
 }
