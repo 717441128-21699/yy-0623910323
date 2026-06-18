@@ -156,3 +156,49 @@
   color: $color-text-tertiary;
   margin-top: $spacing-md;
 }
+
+.emptyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx $spacing-xl;
+}
+
+.emptyEmoji {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.emptyDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-lg;
+  text-align: center;
+}
+
+.emptyBtn {
+  padding: $spacing-md $spacing-xl;
+  background: $color-primary;
+  border-radius: $radius-button;
+  box-shadow: 0 4rpx 16rpx rgba(79, 110, 247, 0.3);
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.emptyBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}

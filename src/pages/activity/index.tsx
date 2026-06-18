@@ -8,7 +8,7 @@ import { ActivityType, ACTIVITY_TYPE_META } from '@/types/reputation'
 import ActivityCard from '@/components/ActivityCard'
 
 const ActivityPage: React.FC = () => {
-  const { selectedActivityId, getFilteredActivities, setSearchKeyword, setTimeRange, searchKeyword, timeRange } = useReputationStore()
+  const { selectedActivityId, getFilteredActivities, setSearchKeyword, setTimeRange, searchKeyword, timeRange, resetFilters } = useReputationStore()
   const [activeFilter, setActiveFilter] = useState<ActivityType | 'all'>('all')
   const [localSearch, setLocalSearch] = useState(searchKeyword)
 
@@ -147,10 +147,19 @@ const ActivityPage: React.FC = () => {
           ))}
         </View>
       ) : (
-        <View className={styles.empty}>
-          <Text className={styles.emptyText}>
-            {searchActive ? '没有找到匹配的活动，试试其他关键词' : '暂无相关活动'}
+        <View className={styles.emptyBox}>
+          <Text className={styles.emptyEmoji}>{searchActive ? '🔍' : '📋'}</Text>
+          <Text className={styles.emptyTitle}>
+            {searchActive ? '未找到匹配的活动' : '暂无相关活动'}
           </Text>
+          <Text className={styles.emptyDesc}>
+            {searchActive ? '请尝试调整搜索关键词或时间范围' : '该分类下暂无活动'}
+          </Text>
+          {searchActive && (
+            <View className={styles.emptyBtn} onClick={resetFilters}>
+              <Text className={styles.emptyBtnText}>查看全部活动</Text>
+            </View>
+          )}
         </View>
       )}
     </View>

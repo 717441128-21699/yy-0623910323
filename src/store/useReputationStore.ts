@@ -7,7 +7,7 @@ export type TimeRange = 'all' | '7days' | '30days'
 interface ReputationState {
   activities: Activity[]
   reviewItems: ReviewItemType[]
-  selectedActivityId: string
+  selectedActivityId: string | null
   activeCommentType: CommentType | 'all'
   searchKeyword: string
   timeRange: TimeRange
@@ -20,12 +20,13 @@ interface ReputationState {
   setTimeRange: (range: TimeRange) => void
   setCompareMode: (enabled: boolean) => void
   getFilteredActivities: () => Activity[]
+  resetFilters: () => void
 }
 
 export const useReputationStore = create<ReputationState>((set, get) => ({
   activities: mockActivities,
   reviewItems: mockReviewItems,
-  selectedActivityId: mockActivities[0]?.id || '',
+  selectedActivityId: mockActivities[0]?.id || null,
   activeCommentType: 'all',
   searchKeyword: '',
   timeRange: 'all',
@@ -53,14 +54,22 @@ export const useReputationStore = create<ReputationState>((set, get) => ({
 
   getSelectedActivity: () => {
     const state = get()
+    if (!state.selectedActivityId) return undefined
     return state.activities.find(a => a.id === state.selectedActivityId)
   },
 
   setSearchKeyword: (keyword: string) => {
     set({ searchKeyword: keyword })
     const filtered = get().getFilteredActivities()
-    if (filtered.length > 0 && !filtered.find(a => a.id === get().selectedActivityId)) {
-      set({ selectedActivityId: filtered[0].id })
+    if (filtered.length > 0) {
+      const currentValid = filtered.find(a => a.id === get().selectedActivityId)
+      if (!currentValid) {
+        set({ selectedActivityId: filtered[0].id })
+        console.log('[ReputationStore] auto switch to first filtered:', filtered[0].id)
+      }
+    } else {
+      set({ selectedActivityId: null })
+      console.log('[ReputationStore] no filtered results, clear selection')
     }
     console.log('[ReputationStore] search keyword:', keyword)
   },
@@ -68,8 +77,15 @@ export const useReputationStore = create<ReputationState>((set, get) => ({
   setTimeRange: (range: TimeRange) => {
     set({ timeRange: range })
     const filtered = get().getFilteredActivities()
-    if (filtered.length > 0 && !filtered.find(a => a.id === get().selectedActivityId)) {
-      set({ selectedActivityId: filtered[0].id })
+    if (filtered.length > 0) {
+      const currentValid = filtered.find(a => a.id === get().selectedActivityId)
+      if (!currentValid) {
+        set({ selectedActivityId: filtered[0].id })
+        console.log('[ReputationStore] auto switch to first filtered:', filtered[0].id)
+      }
+    } else {
+      set({ selectedActivityId: null })
+      console.log('[ReputationStore] no filtered results, clear selection')
     }
     console.log('[ReputationStore] time range:', range)
   },
@@ -77,6 +93,15 @@ export const useReputationStore = create<ReputationState>((set, get) => ({
   setCompareMode: (enabled: boolean) => {
     set({ compareMode: enabled })
     console.log('[ReputationStore] compare mode:', enabled)
+  },
+
+  resetFilters: () => {
+    set({
+      searchKeyword: '',
+      timeRange: 'all',
+      selectedActivityId: mockActivities[0]?.id || null
+    })
+    console.log('[ReputationStore] filters reset')
   },
 
   getFilteredActivities: () => {

@@ -368,10 +368,17 @@ export function getActivityById(id: string): Activity | undefined {
 }
 
 export function getPreviousSameTypeActivity(currentId: string, type: ActivityType): Activity | undefined {
-  const sameTypeActivities = mockActivities
-    .filter(a => a.type === type && a.id !== currentId)
+  const current = mockActivities.find(a => a.id === currentId)
+  if (!current) return undefined
+  const currentDate = new Date(current.date).getTime()
+  const previousSameType = mockActivities
+    .filter(a => a.type === type && a.id !== currentId && new Date(a.date).getTime() < currentDate)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  return sameTypeActivities[0]
+  return previousSameType[0]
+}
+
+export function getKeywordsByDimension(activity: Activity, dimension: string) {
+  return activity.keywords.filter(k => k.dimension === dimension).slice(0, 3)
 }
 
 export function getReviewsByActivityId(activityId: string): ReviewItemType[] {
