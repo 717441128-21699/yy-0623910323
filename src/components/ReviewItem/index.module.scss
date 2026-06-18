@@ -94,5 +94,61 @@
   font-size: $font-size-sm;
   color: $color-text-secondary;
   line-height: 1.6;
-  @include text-ellipsis-multi(2);
+  @include text-ellipsis-multi(3);
+}
+
+.sourceBar {
+  margin-top: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1rpx dashed $color-divider;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.sourceLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}
+
+.sourceTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  background: $color-primary-bg;
+  padding: 6rpx 16rpx;
+  border-radius: $radius-button;
+  flex: 1;
+  min-width: 0;
+  transition: all $transition-fast;
+
+  &:active {
+    background: rgba(79, 110, 247, 0.2);
+  }
+}
+
+.sourceType {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 2rpx 10rpx;
+  border-radius: $radius-xs;
+  flex-shrink: 0;
+}
+
+.sourceTitle {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  flex: 1;
+  min-width: 0;
+  @include text-ellipsis;
+}
+
+.sourceArrow {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  flex-shrink: 0;
+  font-weight: $font-weight-medium;
 }

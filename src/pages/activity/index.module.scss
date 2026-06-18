@@ -22,6 +22,75 @@
   font-weight: $font-weight-bold;
   color: $color-text-primary;
   line-height: 1.3;
+  margin-bottom: $spacing-md;
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background: $color-bg-card;
+  border-radius: $radius-button;
+  padding: 0 $spacing-md;
+  height: $button-height-md;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: $spacing-md;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.searchInput {
+  flex: 1;
+  height: 100%;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  background: transparent;
+}
+
+.clearBtn {
+  flex-shrink: 0;
+  padding: 0 8rpx;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.timeRangeBar {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+}
+
+.timeRangeItem {
+  flex: 1;
+  padding: 14rpx 0;
+  background: $color-bg-card;
+  border-radius: $radius-button;
+  text-align: center;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  transition: all $transition-base;
+
+  &.active {
+    background: $color-primary;
+
+    .timeRangeText {
+      color: $color-text-white;
+      font-weight: $font-weight-semibold;
+    }
+  }
+}
+
+.timeRangeText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
 }
 
 .filterBar {
@@ -38,7 +107,6 @@
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
 
   &.active {
     background: $color-primary;
@@ -61,6 +129,12 @@
   font-size: $font-size-md;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.resultTip {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
   margin-bottom: $spacing-md;
 }
 

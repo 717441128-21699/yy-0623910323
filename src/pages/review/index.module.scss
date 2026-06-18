@@ -147,3 +147,18 @@
   font-size: $font-size-sm;
   color: $color-primary;
 }
+
+.showDoneBtn {
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  text-align: center;
+}
+
+.showDoneText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}

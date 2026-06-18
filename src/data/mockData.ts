@@ -1,4 +1,4 @@
-import { Activity, ReviewItemType, CommentSample } from '@/types/reputation'
+import { Activity, ReviewItemType, CommentSample, ActivityType } from '@/types/reputation'
 
 export const mockActivities: Activity[] = [
   {
@@ -199,7 +199,8 @@ export const mockReviewItems: ReviewItemType[] = [
     title: '建立舆情快速响应机制',
     description: '上次争议事件响应时间偏晚（约4小时），建议建立2小时内的快速响应机制。提前准备常见争议类型的回应模板，缩短决策链路。',
     priority: 'high',
-    status: 'pending'
+    status: 'pending',
+    relatedActivityId: 'act-002'
   },
   {
     id: 'review-007',
@@ -219,43 +220,160 @@ export const mockReviewItems: ReviewItemType[] = [
   }
 ]
 
-export const mockComments: Record<string, CommentSample[]> = {
-  '气质好': [
-    { id: 'c1', content: '真的太有气质了，站在那里就是风景线', type: 'fan', source: '微博', likes: 2341, time: '2小时前' },
-    { id: 'c2', content: '仪态是真的好，看得出来平时有在练', type: 'passerby', source: '小红书', likes: 876, time: '5小时前' },
-    { id: 'c3', content: '该艺人红毯造型一向稳定，气质在同年龄段女星中属于第一梯队', type: 'media', source: '搜狐娱乐', likes: 543, time: '1天前' }
-  ],
-  '演技': [
-    { id: 'c4', content: '演技真的绝了，这段哭戏我跟着哭了', type: 'fan', source: '微博', likes: 5678, time: '3小时前' },
-    { id: 'c5', content: '说真的，演技在小花里算能打的，不出戏', type: 'passerby', source: '豆瓣', likes: 2341, time: '8小时前' },
-    { id: 'c6', content: '业内评价：该演员对角色的理解和呈现能力在同龄演员中较为突出，具备进一步发展的潜力', type: 'media', source: '影视独舌', likes: 1234, time: '2天前' }
-  ],
-  '真诚': [
-    { id: 'c7', content: '看了专访，真的好真诚一女的，粉了粉了', type: 'fan', source: '微博', likes: 3876, time: '1小时前' },
-    { id: 'c8', content: '难得看到这么实在的采访，不打太极，有什么说什么', type: 'passerby', source: '知乎', likes: 1876, time: '6小时前' },
-    { id: 'c9', content: '专访内容有深度有态度，展现了青年演员的思考与担当', type: 'media', source: '人物杂志', likes: 2543, time: '3天前' }
-  ],
-  '礼服好看': [
-    { id: 'c10', content: '这套礼服绝了！太适合她了', type: 'fan', source: '微博', likes: 1892, time: '4小时前' },
-    { id: 'c11', content: '高定就是不一样，质感真好', type: 'passerby', source: '小红书', likes: 956, time: '10小时前' },
-    { id: 'c12', content: '本次红毯最佳造型之一，选款精准，与个人气质高度契合', type: 'media', source: '时尚芭莎', likes: 765, time: '1天前' }
-  ],
-  '演技在线': [
-    { id: 'c13', content: '姐姐演技一直在线，放心追', type: 'fan', source: '微博', likes: 3210, time: '2小时前' },
-    { id: 'c14', content: '本来是冲着剧情看的，结果被女主演技圈粉了', type: 'passerby', source: '豆瓣', likes: 1876, time: '12小时前' },
-    { id: 'c15', content: '剧集播出后女主角演技收获好评，角色完成度高', type: 'media', source: '骨朵传媒', likes: 1023, time: '2天前' }
-  ],
-  '三观正': [
-    { id: 'c16', content: '三观太正了，真的是优质偶像', type: 'fan', source: '微博', likes: 4521, time: '30分钟前' },
-    { id: 'c17', content: '能说出这番话的艺人不多了，很清醒', type: 'passerby', source: '知乎', likes: 2341, time: '3小时前' },
-    { id: 'c18', content: '专访展现了艺人成熟的职业观和价值观，为年轻人树立了正面榜样', type: 'media', source: '光明网', likes: 1876, time: '2天前' }
+const fanCommentsPool = [
+  '姐姐真的太优秀了，一直都在进步！',
+  '永远支持你，你是最棒的！',
+  '看了好感动，我们会一直陪着你',
+  '这是什么神仙颜值啊救命',
+  '太爱了，每天都在循环看',
+  '我们家宝贝值得所有美好',
+  '又美又努力，活该你红',
+  '真的好喜欢你，加油呀',
+  '状态太好了吧，慕了慕了',
+  '演技真的绝，每次都有惊喜',
+  '好真诚一女的，粉了不亏',
+  '哭戏看的我泪流满面',
+  '三观太正了，真的优质偶像',
+  '今天也是为姐姐心动的一天',
+  '太宠粉了吧，感动哭了'
+]
+
+const passerbyCommentsPool = [
+  '说实话，这次表现确实不错',
+  '路人表示挺有好感的，继续关注',
+  '之前没注意到，现在觉得还可以',
+  '确实有点东西，不是花瓶',
+  '路人一枚，觉得挺真实的',
+  '业务能力在线的，未来可期',
+  '挺有气质的，让人舒服',
+  '还行吧，中规中矩',
+  '之前的作品都看过，演技过关',
+  '希望能有更多好作品',
+  '仪态不错，看得出来下功夫了',
+  '采访回答挺有水平的',
+  '不吹不黑，这次真的可以',
+  '比想象中要好很多',
+  '感觉很真实，不装'
+]
+
+const mediaCommentsPool = [
+  '整体表现稳中有进，展现出良好的职业素养',
+  '该艺人在本次活动中的表现可圈可点',
+  '业内人士评价：具备持续发展的潜力与空间',
+  '本次活动造型团队选品精准，与艺人气质契合度高',
+  '从数据表现来看，大众认可度呈稳步上升趋势',
+  '专访内容兼具深度与传播性，为青年演员树立了良好示范',
+  '角色完成度高，受到观众与业内双重认可',
+  '在同年龄段艺人中处于第一梯队，后续发展值得期待',
+  '公开场合言行得体，展现出成熟的公众形象',
+  '综合各平台反馈，本次活动口碑以正面评价为主'
+]
+
+const sources = ['微博', '小红书', '豆瓣', '知乎', '抖音', 'B站评论']
+
+function getRandomItem<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
+
+function generateComments(keyword: string, sentiment: 'positive' | 'neutral' | 'negative'): CommentSample[] {
+  const prefixFan = sentiment === 'positive' ? '' : sentiment === 'negative' ? '虽然但是，' : '客观说，'
+  const prefixPasserby = sentiment === 'positive' ? '路人觉得' : sentiment === 'negative' ? '感觉' : '说实话，'
+  const prefixMedia = sentiment === 'positive' ? '' : sentiment === 'negative' ? '部分方面' : '整体而言，'
+
+  return [
+    {
+      id: `c-${keyword}-fan`,
+      content: `${prefixFan}${keyword}！${getRandomItem(fanCommentsPool)}`,
+      type: 'fan',
+      source: getRandomItem(sources),
+      likes: 800 + Math.floor(Math.random() * 4000),
+      time: `${Math.floor(Math.random() * 23) + 1}小时前`
+    },
+    {
+      id: `c-${keyword}-passerby`,
+      content: `${prefixPasserby}${keyword}这块${sentiment === 'positive' ? '确实不错' : sentiment === 'negative' ? '还有提升空间' : '中规中矩'}，${getRandomItem(passerbyCommentsPool)}`,
+      type: 'passerby',
+      source: getRandomItem(sources),
+      likes: 200 + Math.floor(Math.random() * 1500),
+      time: `${Math.floor(Math.random() * 23) + 1}小时前`
+    },
+    {
+      id: `c-${keyword}-media`,
+      content: `${prefixMedia}关于"${keyword}"相关讨论度较高，${getRandomItem(mediaCommentsPool)}`,
+      type: 'media',
+      source: getRandomItem(['搜狐娱乐', '新浪娱乐', '腾讯娱乐', '网易娱乐', '骨朵传媒', '影视独舌']),
+      likes: 100 + Math.floor(Math.random() * 800),
+      time: `${Math.floor(Math.random() * 2) + 1}天前`
+    },
+    {
+      id: `c-${keyword}-fan2`,
+      content: `${keyword === 'positive' ? '' : keyword + '！'}每次都不会让人失望，${getRandomItem(fanCommentsPool)}`,
+      type: 'fan',
+      source: getRandomItem(sources),
+      likes: 500 + Math.floor(Math.random() * 2000),
+      time: `${Math.floor(Math.random() * 23) + 1}小时前`
+    }
   ]
+}
+
+export function getCommentsByKeyword(keyword: string, sentiment?: 'positive' | 'neutral' | 'negative'): CommentSample[] {
+  const specific: Record<string, CommentSample[]> = {
+    '气质好': [
+      { id: 'c1', content: '真的太有气质了，站在那里就是风景线', type: 'fan', source: '微博', likes: 2341, time: '2小时前' },
+      { id: 'c2', content: '仪态是真的好，看得出来平时有在练', type: 'passerby', source: '小红书', likes: 876, time: '5小时前' },
+      { id: 'c3', content: '该艺人红毯造型一向稳定，气质在同年龄段女星中属于第一梯队', type: 'media', source: '搜狐娱乐', likes: 543, time: '1天前' },
+      { id: 'c1b', content: '走路带风说的就是她吧', type: 'fan', source: '抖音', likes: 1865, time: '3小时前' }
+    ],
+    '演技': [
+      { id: 'c4', content: '演技真的绝了，这段哭戏我跟着哭了', type: 'fan', source: '微博', likes: 5678, time: '3小时前' },
+      { id: 'c5', content: '说真的，演技在小花里算能打的，不出戏', type: 'passerby', source: '豆瓣', likes: 2341, time: '8小时前' },
+      { id: 'c6', content: '业内评价：该演员对角色的理解和呈现能力在同龄演员中较为突出', type: 'media', source: '影视独舌', likes: 1234, time: '2天前' },
+      { id: 'c4b', content: '眼神戏太有戏了', type: 'fan', source: 'B站评论', likes: 1543, time: '6小时前' }
+    ],
+    '真诚': [
+      { id: 'c7', content: '看了专访，真的好真诚一女的，粉了粉了', type: 'fan', source: '微博', likes: 3876, time: '1小时前' },
+      { id: 'c8', content: '难得看到这么实在的采访，不打太极，有什么说什么', type: 'passerby', source: '知乎', likes: 1876, time: '6小时前' },
+      { id: 'c9', content: '专访内容有深度有态度，展现了青年演员的思考与担当', type: 'media', source: '人物杂志', likes: 2543, time: '3天前' },
+      { id: 'c7b', content: '不立人设，做自己就好', type: 'fan', source: '小红书', likes: 987, time: '4小时前' }
+    ],
+    '礼服好看': [
+      { id: 'c10', content: '这套礼服绝了！太适合她了', type: 'fan', source: '微博', likes: 1892, time: '4小时前' },
+      { id: 'c11', content: '高定就是不一样，质感真好', type: 'passerby', source: '小红书', likes: 956, time: '10小时前' },
+      { id: 'c12', content: '本次红毯最佳造型之一，选款精准', type: 'media', source: '时尚芭莎', likes: 765, time: '1天前' },
+      { id: 'c10b', content: '造型师今天加鸡腿', type: 'fan', source: '抖音', likes: 1123, time: '7小时前' }
+    ],
+    '演技在线': [
+      { id: 'c13', content: '姐姐演技一直在线，放心追', type: 'fan', source: '微博', likes: 3210, time: '2小时前' },
+      { id: 'c14', content: '本来是冲着剧情看的，结果被女主演技圈粉了', type: 'passerby', source: '豆瓣', likes: 1876, time: '12小时前' },
+      { id: 'c15', content: '剧集播出后女主角演技收获好评，角色完成度高', type: 'media', source: '骨朵传媒', likes: 1023, time: '2天前' },
+      { id: 'c13b', content: '微表情太到位了', type: 'fan', source: 'B站评论', likes: 876, time: '9小时前' }
+    ],
+    '三观正': [
+      { id: 'c16', content: '三观太正了，真的是优质偶像', type: 'fan', source: '微博', likes: 4521, time: '30分钟前' },
+      { id: 'c17', content: '能说出这番话的艺人不多了，很清醒', type: 'passerby', source: '知乎', likes: 2341, time: '3小时前' },
+      { id: 'c18', content: '专访展现了艺人成熟的职业观和价值观，为年轻人树立了正面榜样', type: 'media', source: '光明网', likes: 1876, time: '2天前' },
+      { id: 'c16b', content: '这才是公众人物该有的样子', type: 'fan', source: '小红书', likes: 1654, time: '5小时前' }
+    ]
+  }
+
+  if (specific[keyword]) {
+    return specific[keyword]
+  }
+
+  return generateComments(keyword, sentiment || 'neutral')
 }
 
 export function getActivityById(id: string): Activity | undefined {
   return mockActivities.find(item => item.id === id)
 }
 
-export function getCommentsByKeyword(keyword: string): CommentSample[] {
-  return mockComments[keyword] || []
+export function getPreviousSameTypeActivity(currentId: string, type: ActivityType): Activity | undefined {
+  const sameTypeActivities = mockActivities
+    .filter(a => a.type === type && a.id !== currentId)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  return sameTypeActivities[0]
+}
+
+export function getReviewsByActivityId(activityId: string): ReviewItemType[] {
+  return mockReviewItems.filter(item => item.relatedActivityId === activityId)
 }

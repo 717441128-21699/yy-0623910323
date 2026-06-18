@@ -10,7 +10,7 @@ import ReviewItem from '@/components/ReviewItem'
 type CategoryKey = 'all' | 'interview' | 'styling' | 'fan_communication' | 'other'
 
 const ReviewPage: React.FC = () => {
-  const { reviewItems, toggleReviewStatus } = useReputationStore()
+  const { reviewItems, toggleReviewStatus, setSelectedActivity } = useReputationStore()
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('all')
   const [showDone, setShowDone] = useState(true)
 
@@ -39,6 +39,12 @@ const ReviewPage: React.FC = () => {
     console.log('[ReviewPage] toggle item:', id)
   }
 
+  const handleSourceClick = (activityId: string) => {
+    setSelectedActivity(activityId)
+    Taro.switchTab({ url: '/pages/cloudmap/index' })
+    console.log('[ReviewPage] navigate to activity cloudmap:', activityId)
+  }
+
   const handleRefresh = () => {
     console.log('[ReviewPage] pull down refresh')
     setTimeout(() => {
@@ -58,27 +64,31 @@ const ReviewPage: React.FC = () => {
     ...REVIEW_CATEGORY_META.map(m => ({ key: m.key, label: m.label }))
   ]
 
+  const pendingCount = activeCategory === 'all'
+    ? pendingItems.length
+    : pendingItems.filter(i => i.category === activeCategory).length
+
   return (
     <View className={styles.page}>
       <View className={styles.header}>
         <Text className={styles.title}>复盘清单</Text>
         <Text className={styles.subtitle}>把可改进事项分类整理，持续优化</Text>
-      </View>
 
-      <View className={styles.statsBar}>
-        <View className={styles.statCard}>
-          <Text className={styles.statNum}>{pendingItems.length}</Text>
-          <Text className={styles.statLabel}>待处理</Text>
-        </View>
-        <View className={styles.statCard}>
-          <Text className={styles.statNum}>{doneItems.length}</Text>
-          <Text className={styles.statLabel}>已完成</Text>
-        </View>
-        <View className={styles.statCard}>
-          <Text className={styles.statNum}>
-            {reviewItems.length > 0 ? Math.round((doneItems.length / reviewItems.length) * 100) : 0}%
-          </Text>
-          <Text className={styles.statLabel}>完成率</Text>
+        <View className={styles.statsBar}>
+          <View className={styles.statCard}>
+            <Text className={styles.statNum}>{pendingItems.length}</Text>
+            <Text className={styles.statLabel}>待处理</Text>
+          </View>
+          <View className={styles.statCard}>
+            <Text className={styles.statNum}>{doneItems.length}</Text>
+            <Text className={styles.statLabel}>已完成</Text>
+          </View>
+          <View className={styles.statCard}>
+            <Text className={styles.statNum}>
+              {reviewItems.length > 0 ? Math.round((doneItems.length / reviewItems.length) * 100) : 0}%
+            </Text>
+            <Text className={styles.statLabel}>完成率</Text>
+          </View>
         </View>
       </View>
 
@@ -107,7 +117,7 @@ const ReviewPage: React.FC = () => {
       >
         <View className={styles.sectionHeader}>
           <Text className={styles.sectionTitle}>待处理</Text>
-          <Text className={styles.sectionCount}>{filteredPending.length} 项</Text>
+          <Text className={styles.sectionCount}>{pendingCount} 项</Text>
         </View>
 
         {filteredPending.length > 0 ? (
@@ -117,19 +127,29 @@ const ReviewPage: React.FC = () => {
                 key={item.id}
                 item={item}
                 onToggle={handleToggle}
+                showSource={true}
+                onSourceClick={handleSourceClick}
               />
             ))}
           </View>
         ) : (
           <View className={styles.empty}>
-            <Text className={styles.emptyText}>暂无待处理事项</Text>
+            <Text className={styles.emptyText}>
+              {activeCategory === 'all' ? '太棒了，没有待处理事项 🎉' : '该分类暂无待处理事项'}
+            </Text>
           </View>
         )}
 
-        {showDone && (
+        {showDone && filteredDone.length > 0 && (
           <View className={styles.doneSection}>
             <View className={styles.doneHeader}>
               <Text className={styles.doneTitle}>已完成 ({filteredDone.length})</Text>
+              <Text
+                className={styles.doneToggle}
+                onClick={() => setShowDone(false)}
+              >
+                收起
+              </Text>
             </View>
             <View className={styles.list}>
               {filteredDone.map(item => (
@@ -137,9 +157,17 @@ const ReviewPage: React.FC = () => {
                   key={item.id}
                   item={item}
                   onToggle={handleToggle}
+                  showSource={true}
+                  onSourceClick={handleSourceClick}
                 />
               ))}
             </View>
+          </View>
+        )}
+
+        {!showDone && filteredDone.length > 0 && (
+          <View className={styles.showDoneBtn} onClick={() => setShowDone(true)}>
+            <Text className={styles.showDoneText}>展开已完成 ({filteredDone.length})</Text>
           </View>
         )}
       </ScrollView>

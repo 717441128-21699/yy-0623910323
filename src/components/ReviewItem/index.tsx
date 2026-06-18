@@ -2,16 +2,25 @@ import React from 'react'
 import { View, Text } from '@tarojs/components'
 import classnames from 'classnames'
 import styles from './index.module.scss'
-import { ReviewItemType } from '@/types/reputation'
-import { REVIEW_CATEGORY_META } from '@/types/reputation'
+import { ReviewItemType, REVIEW_CATEGORY_META } from '@/types/reputation'
+import { getActivityById } from '@/data/mockData'
+import { getActivityTypeLabel } from '@/utils'
 
 interface ReviewItemProps {
   item: ReviewItemType
   onToggle?: (id: string) => void
+  showSource?: boolean
+  onSourceClick?: (activityId: string) => void
 }
 
-const ReviewItem: React.FC<ReviewItemProps> = ({ item, onToggle }) => {
+const ReviewItem: React.FC<ReviewItemProps> = ({
+  item,
+  onToggle,
+  showSource = true,
+  onSourceClick
+}) => {
   const categoryInfo = REVIEW_CATEGORY_META.find(c => c.key === item.category) || REVIEW_CATEGORY_META[3]
+  const relatedActivity = item.relatedActivityId ? getActivityById(item.relatedActivityId) : undefined
 
   const getPriorityText = (priority: string) => {
     const map: Record<string, string> = {
@@ -33,6 +42,13 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ item, onToggle }) => {
 
   const handleToggle = () => {
     onToggle?.(item.id)
+  }
+
+  const handleSourceClick = (e: any) => {
+    e.stopPropagation()
+    if (item.relatedActivityId && onSourceClick) {
+      onSourceClick(item.relatedActivityId)
+    }
   }
 
   return (
@@ -66,6 +82,22 @@ const ReviewItem: React.FC<ReviewItemProps> = ({ item, onToggle }) => {
 
         <Text className={styles.title}>{item.title}</Text>
         <Text className={styles.description}>{item.description}</Text>
+
+        {showSource && relatedActivity && (
+          <View
+            className={styles.sourceBar}
+            onClick={handleSourceClick}
+          >
+            <Text className={styles.sourceLabel}>来源活动</Text>
+            <View className={styles.sourceTag}>
+              <Text className={styles.sourceType}>
+                {getActivityTypeLabel(relatedActivity.type)}
+              </Text>
+              <Text className={styles.sourceTitle}>{relatedActivity.title}</Text>
+              <Text className={styles.sourceArrow}>→</Text>
+            </View>
+          </View>
+        )}
       </View>
     </View>
   )
