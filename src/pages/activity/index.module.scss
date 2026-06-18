@@ -202,3 +202,147 @@
   color: $color-text-white;
   font-weight: $font-weight-medium;
 }
+
+.sectionTip {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: -$spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.trendGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
+  margin-bottom: 40rpx;
+}
+
+.trendCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &.emptyCard {
+    opacity: 0.6;
+    cursor: default;
+
+    &:active {
+      transform: none;
+    }
+  }
+}
+
+.trendCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.trendCardLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.trendCardCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  background: $color-bg-tag;
+  padding: 4rpx 10rpx;
+  border-radius: $radius-button;
+}
+
+.trendCardScoreRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  margin-bottom: 4rpx;
+}
+
+.trendCardScore {
+  font-size: 48rpx;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  line-height: 1.1;
+}
+
+.trendCardTrend {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+
+  &.up {
+    color: $color-success;
+  }
+
+  &.down {
+    color: $color-error;
+  }
+
+  &.flat {
+    color: $color-text-tertiary;
+  }
+}
+
+.trendCardTrendLabel {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.trendCardDivider {
+  height: 1rpx;
+  background: $color-divider;
+  margin-bottom: $spacing-sm;
+}
+
+.trendCardReviewRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-bottom: 6rpx;
+}
+
+.trendCardReviewBar {
+  flex: 1;
+  height: 8rpx;
+  background: $color-bg-tag;
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+
+.trendCardReviewFill {
+  height: 100%;
+  border-radius: 4rpx;
+  background: linear-gradient(90deg, $color-success 0%, #22c55e 100%);
+  transition: width 0.5s ease;
+}
+
+.trendCardReviewRate {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  min-width: 60rpx;
+  text-align: right;
+}
+
+.trendCardReviewLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.trendCardEmpty {
+  padding: 40rpx 0;
+  text-align: center;
+}
+
+.trendCardEmptyText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

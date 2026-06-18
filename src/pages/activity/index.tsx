@@ -5,10 +5,22 @@ import classnames from 'classnames'
 import styles from './index.module.scss'
 import { useReputationStore, TimeRange } from '@/store/useReputationStore'
 import { ActivityType, ACTIVITY_TYPE_META } from '@/types/reputation'
+import { getChangeText } from '@/utils'
 import ActivityCard from '@/components/ActivityCard'
 
 const ActivityPage: React.FC = () => {
-  const { selectedActivityId, getFilteredActivities, setSearchKeyword, setTimeRange, searchKeyword, timeRange, resetFilters } = useReputationStore()
+  const {
+    selectedActivityId,
+    activities,
+    reviewItems,
+    getFilteredActivities,
+    setSearchKeyword,
+    setTimeRange,
+    setSelectedActivity,
+    searchKeyword,
+    timeRange,
+    resetFilters
+  } = useReputationStore()
   const [activeFilter, setActiveFilter] = useState<ActivityType | 'all'>('all')
   const [localSearch, setLocalSearch] = useState(searchKeyword)
 
@@ -22,6 +34,50 @@ const ActivityPage: React.FC = () => {
     if (activeFilter === 'all') return allFiltered
     return allFiltered.filter(item => item.type === activeFilter)
   }, [allFiltered, activeFilter])
+
+  const typeTrendStats = useMemo(() => {
+    return ACTIVITY_TYPE_META.map(meta => {
+      const typeActivities = activities
+        .filter(a => a.type === meta.key)
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+      const count = typeActivities.length
+      const avgScore = count > 0
+        ? Math.round(typeActivities.reduce((sum, a) => sum + a.overallScore, 0) / count)
+        : 0
+      const latestScore = count > 0 ? typeActivities[typeActivities.length - 1].overallScore : 0
+      const earliestScore = count > 0 ? typeActivities[0].overallScore : 0
+      const trend = count >= 2 ? latestScore - earliestScore : 0
+
+      const typeReviewIds = new Set(
+        reviewItems.filter(r => {
+          if (!r.relatedActivityId) return false
+          const act = activities.find(a => a.id === r.relatedActivityId)
+          return act?.type === meta.key
+        }).map(r => r.id)
+      )
+      const typeReviews = reviewItems.filter(r => typeReviewIds.has(r.id))
+      const reviewTotal = typeReviews.length
+      const reviewDone = typeReviews.filter(r => r.status === 'done').length
+      const reviewRate = reviewTotal > 0 ? Math.round((reviewDone / reviewTotal) * 100) : 0
+
+      const latestId = count > 0 ? typeActivities[typeActivities.length - 1].id : ''
+
+      return {
+        type: meta.key,
+        label: meta.label,
+        count,
+        avgScore,
+        latestScore,
+        earliestScore,
+        trend,
+        reviewTotal,
+        reviewDone,
+        reviewRate,
+        latestId
+      }
+    })
+  }, [activities, reviewItems])
 
   const handleSearchChange = (val: string) => {
     setLocalSearch(val)
@@ -44,6 +100,15 @@ const ActivityPage: React.FC = () => {
   const handleFilterChange = (type: ActivityType | 'all') => {
     setActiveFilter(type)
     console.log('[ActivityPage] filter changed:', type)
+  }
+
+  const handleTypeCardClick = (type: ActivityType, latestId: string) => {
+    setActiveFilter(type)
+    if (latestId) {
+      setSelectedActivity(latestId)
+      Taro.switchTab({ url: '/pages/cloudmap/index' })
+    }
+    console.log('[ActivityPage] type card clicked:', type, latestId)
   }
 
   const handleRefresh = () => {
@@ -73,8 +138,18 @@ const ActivityPage: React.FC = () => {
 
   const searchActive = searchKeyword || timeRange !== 'all'
 
+  const getTrendClass = (trend: number) => {
+    if (trend > 0) return 'up'
+    if (trend < 0) return 'down'
+    return 'flat'
+  }
+
   return (
-    <View className={styles.page}>
+    <ScrollView
+      scrollY
+      className={styles.page}
+      showScrollbar={false}
+    >
       <View className={styles.header}>
         <Text className={styles.greeting}>近期活动概览</Text>
         <Text className={styles.title}>口碑反馈面板</Text>
@@ -162,7 +237,65 @@ const ActivityPage: React.FC = () => {
           )}
         </View>
       )}
-    </View>
+
+      <Text className={styles.sectionTitle} style={{ marginTop: '24rpx' }}>
+        📊 按活动类型看趋势
+      </Text>
+      <Text className={styles.sectionTip}>点击卡片可查看该类最新活动详情</Text>
+
+      <View className={styles.trendGrid}>
+        {typeTrendStats.map(item => {
+          const trendClass = getTrendClass(item.trend)
+          return (
+            <View
+              key={item.type}
+              className={classnames(
+                styles.trendCard,
+                item.count === 0 && styles.emptyCard
+              )}
+              onClick={() => item.latestId && handleTypeCardClick(item.type, item.latestId)}
+            >
+              <View className={styles.trendCardHeader}>
+                <Text className={styles.trendCardLabel}>{item.label}</Text>
+                <Text className={styles.trendCardCount}>
+                  {item.count} 次
+                </Text>
+              </View>
+              {item.count > 0 ? (
+                <>
+                  <View className={styles.trendCardScoreRow}>
+                    <Text className={styles.trendCardScore}>{item.latestScore}</Text>
+                    <Text className={classnames(styles.trendCardTrend, trendClass)}>
+                      {getChangeText(item.trend)}
+                    </Text>
+                  </View>
+                  <Text className={styles.trendCardTrendLabel}>
+                    平均分 {item.avgScore} 分
+                  </Text>
+                  <View className={styles.trendCardDivider}></View>
+                  <View className={styles.trendCardReviewRow}>
+                    <View className={styles.trendCardReviewBar}>
+                      <View
+                        className={styles.trendCardReviewFill}
+                        style={{ width: `${item.reviewRate}%` }}
+                      ></View>
+                    </View>
+                    <Text className={styles.trendCardReviewRate}>{item.reviewRate}%</Text>
+                  </View>
+                  <Text className={styles.trendCardReviewLabel}>
+                    复盘完成 {item.reviewDone}/{item.reviewTotal}
+                  </Text>
+                </>
+              ) : (
+                <View className={styles.trendCardEmpty}>
+                  <Text className={styles.trendCardEmptyText}>暂无该类活动</Text>
+                </View>
+              )}
+            </View>
+          )
+        })}
+      </View>
+    </ScrollView>
   )
 }
 

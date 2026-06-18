@@ -9,7 +9,7 @@ import { KeywordItem, CommentSample, Activity, ReviewItemType, REVIEW_CATEGORY_M
 import RadarChart from '@/components/RadarChart'
 import KeywordCloud from '@/components/KeywordCloud'
 import CommentDrawer from '@/components/CommentDrawer'
-import { getCommentsByKeyword, getPreviousSameTypeActivity, getReviewsByActivityId, getKeywordsByDimension } from '@/data/mockData'
+import { getCommentsByKeyword, getPreviousSameTypeActivity, getKeywordsByDimension } from '@/data/mockData'
 
 const CloudmapPage: React.FC = () => {
   const {
@@ -64,10 +64,64 @@ const CloudmapPage: React.FC = () => {
       .filter(item => Math.abs(item.change) >= 2)
   }, [comparisonData])
 
+  const comparisonSummary = useMemo(() => {
+    if (!selectedActivity || !previousSameTypeActivity || !comparisonData) return ''
+    const overallDiff = selectedActivity.overallScore - previousSameTypeActivity.overallScore
+    const diffText = overallDiff > 0 ? `+${overallDiff}` : String(overallDiff)
+
+    const topUp = comparisonData.filter(d => d.change > 0).sort((a, b) => b.change - a.change)[0]
+    const topDown = comparisonData.filter(d => d.change < 0).sort((a, b) => a.change - b.change)[0]
+
+    const upKeywords = topUp && selectedActivity
+      ? getKeywordsByDimension(selectedActivity, topUp.name).map(k => k.word).join('、')
+      : ''
+    const downKeywords = topDown && selectedActivity
+      ? getKeywordsByDimension(selectedActivity, topDown.name).map(k => k.word).join('、')
+      : ''
+
+    let result = `【${selectedActivity.title} vs ${previousSameTypeActivity.title}】\n`
+    result += `综合分：${selectedActivity.overallScore}分（${diffText === '0' ? '持平' : diffText}）\n\n`
+
+    if (topUp) {
+      result += `🌟 提升最明显：${topUp.name} ${topUp.change > 0 ? '+' : ''}${topUp.change}分\n`
+      result += `   原因：${topUp.reason}\n`
+      if (upKeywords) result += `   相关热词：${upKeywords}\n`
+    }
+    if (topDown) {
+      result += `\n⚠️ 下滑最明显：${topDown.name} ${topDown.change}分\n`
+      result += `   原因：${topDown.reason}\n`
+      if (downKeywords) result += `   相关热词：${downKeywords}\n`
+    }
+    if (!topUp && !topDown) {
+      result += '各维度整体稳定，没有明显的大幅变化。\n'
+    }
+    return result
+  }, [selectedActivity, previousSameTypeActivity, comparisonData])
+
+  const handleCopySummary = () => {
+    if (!comparisonSummary) return
+    Taro.setClipboardData({
+      data: comparisonSummary,
+      success: () => {
+        Taro.showToast({ title: '已复制到剪贴板', icon: 'success', duration: 1500 })
+      }
+    })
+    console.log('[CloudmapPage] copy summary to clipboard')
+  }
+
   const relatedReviews: ReviewItemType[] = useMemo(() => {
     if (!selectedActivity) return []
-    return getReviewsByActivityId(selectedActivity.id)
+    return reviewItems.filter(item => item.relatedActivityId === selectedActivity.id)
   }, [selectedActivity, reviewItems])
+
+  const reviewStats = useMemo(() => {
+    const total = relatedReviews.length
+    const done = relatedReviews.filter(r => r.status === 'done').length
+    const pending = total - done
+    const pendingHigh = relatedReviews.filter(r => r.status === 'pending' && r.priority === 'high').length
+    const progress = total > 0 ? Math.round((done / total) * 100) : 0
+    return { total, done, pending, pendingHigh, progress }
+  }, [relatedReviews])
 
   const handleActivityChange = (id: string) => {
     setSelectedActivity(id)
@@ -247,6 +301,17 @@ const CloudmapPage: React.FC = () => {
                 </View>
               ))}
             </View>
+            {comparisonSummary && (
+              <View className={styles.summaryBlock}>
+                <View className={styles.summaryHeader}>
+                  <Text className={styles.summaryTitle}>📝 复盘摘要</Text>
+                  <View className={styles.copyBtn} onClick={handleCopySummary}>
+                    <Text className={styles.copyBtnText}>复制</Text>
+                  </View>
+                </View>
+                <Text className={styles.summaryText} selectable>{comparisonSummary}</Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -485,6 +550,42 @@ const CloudmapPage: React.FC = () => {
               <Text className={styles.sectionTitle}>📋 本次活动复盘建议</Text>
               <Text className={styles.sectionTip}>点击勾选可标记完成</Text>
             </View>
+
+            <View className={styles.reviewProgress}>
+              <View className={styles.progressRow}>
+                <View className={styles.progressInfo}>
+                  <Text className={styles.progressLabel}>收尾进度</Text>
+                  <Text className={styles.progressPercent}>{reviewStats.progress}%</Text>
+                </View>
+                <View className={styles.progressBar}>
+                  <View
+                    className={styles.progressBarFill}
+                    style={{ width: `${reviewStats.progress}%` }}
+                  ></View>
+                </View>
+              </View>
+              <View className={styles.progressStats}>
+                <View className={styles.progressStat}>
+                  <Text className={styles.progressStatNum}>{reviewStats.total}</Text>
+                  <Text className={styles.progressStatLabel}>总建议</Text>
+                </View>
+                <View className={styles.progressStat}>
+                  <Text className={styles.progressStatNum} style={{ color: '#00b42a' }}>{reviewStats.done}</Text>
+                  <Text className={styles.progressStatLabel}>已处理</Text>
+                </View>
+                <View className={styles.progressStat}>
+                  <Text className={styles.progressStatNum} style={{ color: '#86909c' }}>{reviewStats.pending}</Text>
+                  <Text className={styles.progressStatLabel}>待处理</Text>
+                </View>
+                {reviewStats.pendingHigh > 0 && (
+                  <View className={styles.progressStat}>
+                    <Text className={styles.progressStatNum} style={{ color: '#f53f3f' }}>{reviewStats.pendingHigh}</Text>
+                    <Text className={styles.progressStatLabel}>高优待办</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
             <View className={styles.inlineReviewList}>
               {relatedReviews.map(review => {
                 const catMeta = getCategoryMeta(review.category)
